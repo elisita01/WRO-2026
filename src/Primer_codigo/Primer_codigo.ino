@@ -18,6 +18,14 @@ long distanciaDerecha = 0;
 long distanciaCentro = 0;
 long distanciaIzquierda = 0;
 
+int IN1 = 8; //Pines de el controlador de motores
+int IN2 = 9;
+int ENA = 5;
+
+int IN3 = 10;
+int IN4 = 11;
+int ENB = 6;
+
 void setup() {
   pinMode(trigPinI, OUTPUT); //Luego aquí configuramos los puertos de cada ultrasónico
   pinMode(echoPinI, INPUT);
@@ -27,27 +35,46 @@ void setup() {
 
   pinMode(trigPinC, OUTPUT);
   pinMode(echoPinC, INPUT);
+  
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
+
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENB, OUTPUT);
 
   miServo.attach(pinServo); //Configuración de servo
   miServo.write(90); //Este es el ángulo en donde empieza el servo
 
   Serial.begin(115200); //Esta es la velocidad de la comunicación entre la compu y el arduino
+  delay(3000);
 }
 
 void loop() {
+  Avanzarmotores();
   distanciaDerecha = medirDistancia(trigPinD, echoPinD); //Acá es una función donde le indicamos que lea la información del ultrasónico derecho 
   distanciaCentro = medirDistancia(trigPinC, echoPinC); //función donde le indicamos que lea la información del ultrasónico centro
   distanciaIzquierda = medirDistancia(trigPinI, echoPinI); //función donde le indicamos que lea la información del ultrasónico izquierdo
 
-  Serial.print("Centro: "); 
-  Serial.println(distanciaCentro); //Imprimimos el valor de la distancia centro
+  Serial.print("Derecha: "); 
+  Serial.println(distanciaDerecha); //Imprimimos el valor de la distancia centro
 
-  if (distanciaCentro < 20 && distanciaCentro > 5) { //Si la distancia centro es menor que la distancia límite(20) y la distancia centro es mayor que 5 se moverá nuestro servo
+  if (distanciaDerecha < 20 && distanciaDerecha > 5) { //Si la distancia centro es menor que la distancia límite(20) y la distancia centro es mayor que 5 se moverá nuestro servo
     miServo.write(0);
     delay(2000);
     miServo.write(70);
-   // delay(5000);
+    delay(1000);
   }
+ if (distanciaDerecha == 0){
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENA, 0);
+
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+    analogWrite(ENB, 0);
+ }
 
   delay(5); 
 }
@@ -70,4 +97,14 @@ long medirDistancia(int trigPin, int echoPin) {
 
   long distancia = duracion * 0.034 / 2;
   return distancia;
+}
+
+void Avanzarmotores(){
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENA, 250);
+
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(ENB, 250);
 }
